@@ -1,8 +1,0 @@
-Require valid-user
-AuthType Basic
-AuthName 'Nur fuer Community Member'
-AuthUserFile /home/ylzch/.htpasswds/htpasswd.888b4658-bfd7-4992-8202-bfac3cb9686c
-
-
-#@__HCP_END__@#
-# Anything after the comment above is left alone
