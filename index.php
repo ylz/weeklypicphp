@@ -10,23 +10,23 @@
   		//####################################################################
       echo "<h1>Hallo! <3</h1>";
       echo "<p>Hier kannst du einfach dein Wochen- oder Monatsbild skalieren auf 2048 Pixel (lange Kante) und deine EXIF Beschreibung als Tag setzen. Das Ergebnis lädst du auf dein Gerät wieder herunter und danach auf <a href='https://upload.weeklypic.de/'>https://upload.weeklypic.de/</a> hoch.</p>";
-      echo "<p>Disclaimer: Ja, die Bilder werden zumindest aktuell noch auf diesem Server hier gespeichert und sind mit dem selbem Passwort geschützt abrufbar. Ich lösche die Bilder periodisch von Hand.</p>";
+      echo "<p>Disclaimer: Ja, die Bilder werden zumindest aktuell noch auf diesem Server hier gespeichert und sind mit dem selbem Passwort geschützt abrufbar. Ich lösche die Bilder periodisch von Hand. Für die Funktionalität der Script und auch die Verfügbarkeit übernehme ich weder Garantie noch Haftung.</p>";
     ?>
 
+    <p>
+      <form action="doit.php" method="post" enctype="multipart/form-data">
+        Datei auswählen:
+        <input type="file" name="fileToUpload" id="fileToUpload" required>
+        <br/>
+        Benutzername:
+        <input type="text" id="user" name="user" required>
+        <br/>
+        Bildbeschreibung (optional):
+        <input type="text" id="description" name="description">
+        <br/>
+        <input type="submit" value="Upload Image" name="submit">
+      </form>
+  </p>
 
-    <form action="doit.php" method="post" enctype="multipart/form-data">
-      Datei auswählen:
-      <input type="file" name="fileToUpload" id="fileToUpload" required>
-      Benutzername:
-      <input type="text" id="user" name="user" required>
-      Bildbeschreibung (optional):
-      <input type="text" id="description" name="description">
-      <input type="submit" value="Upload Image" name="submit">
-    </form>
-
-
-    <?php
-      //####################################################################
-  	?>
   </body>
 </html>
