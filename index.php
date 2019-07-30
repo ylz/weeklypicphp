@@ -30,8 +30,18 @@
         Benutzername:
         <input type="text" id="user" name="user" required>
         <br/>
+        Bild-Typ (für den Dateinamen):
+        <!-- input type="text" id="user" name="user" required -->
+
+        <br/>
         Bildbeschreibung (optional):
         <input type="text" id="description" name="description">
+        <br/>
+        Urheber (optional):
+        <input type="text" id="creator" name="creator">
+        <br/>
+        Lizenz (optional):
+        <input type="text" id="license" name="license">
         <br/>
         <input type="submit" value="Upload Image" name="submit">
       </form>
