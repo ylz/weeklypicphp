@@ -19,12 +19,24 @@
   <body>
 
     <?php
+
       $debugging = true;
+      $convert_command = '/usr/local/bin/convert';  // imagemagick covert
+
       include 'src/exif_parsing.php';
+
+      // TODO: replace "die" with function and flag to keep HTML result clean and offer a link back.
+      // IDEA: generate filename from parameters (week/month, w/m-number, Weekly-Pic-Name)
+      // IDEA: validate picture date against parameters week/month and w/m-number
 
       //####################################################################
       // _POST Var Handling
+
+      // TODO: Harden _POST values (Restrict to certain characters)
+
       $user = $_POST["user"];
+      $creator = $_POST["creator"];
+      $license = $_POST["license"];
       $description = $_POST["description"];
       $description_isset = false;
       echo "<h1>Hallo! ❤️</h1>";
@@ -58,9 +70,9 @@
       }
 
       //Überprüfung der Dateigröße
-      $max_size = 5000*1024; //5MB
+      $max_size = 10000*1024; //10MB
       if($_FILES['fileToUpload']['size'] > $max_size) {
-        die("Bitte keine Dateien größer 5MB hochladen");
+        die("Bitte keine Dateien größer 10 MB hochladen");
       }
 
       //Überprüfung dass das Bild keine Fehler enthält
@@ -80,14 +92,17 @@
         die("No PHP-EXIF functions");
       }
 
-      // Pfad zum Upload // TODO: mit generiertem Dateinamen?
+      // Pfad zum Upload
+      // IDEA: Oder Name generiertem Dateinamen erstellen?
       $new_path = $upload_folder.$filename.'.'.$extension;
 
-      //Neuer Dateiname falls die Datei bereits existiert  // TODO: oder bestehendes Bild überschreiben
+      //Neuer Dateiname falls die Datei bereits existiert
+      // IDEA: Oder bestehendes Bild überschreiben?
       if(file_exists($new_path)) { //Falls Datei existiert, hänge eine Zahl an den Dateinamen
         $id = 1;
         do {
           $new_path = $upload_folder.$filename.'_'.$id.'.'.$extension;
+          $tmp_file = $upload_folder.$filename.'_'.$id.'_tmp.'.$extension;
           $id++;
         } while(file_exists($new_path));
       }
@@ -99,33 +114,67 @@
       //####################################################################
       // generate requestet EXIF values
 
-      // TODO: $requested['FileName'] =
+      $requested['.FileName']              = '';
+
       $requested['Title']                  = $description;
+      $requested['ObjectName']             = $requested['Title'];
+
       $requested['ImageDescription']       = $user . ' / ' . $description;
       $requested['Description']            = $requested['ImageDescription'];
-      $requested['ImageWidth']             = '2000';
-      $requested['ImageHeight']            = '2000';
+      $requested['Caption-Abstract']       = $requested['ImageDescription'];
+
+      $requested['.ImageWidth']            = '2000';
+      $requested['.ImageHeight']           = '2000';
       $requested['ExifImageWidth']         = $requested['ImageWidth'];
       $requested['ExifImageHeight']        = $requested['ImageHeight'];
-      $requested['Artist']                 = $_POST["creator"];
+
+      $requested['Artist']                 = $creator;
       $requested['Creator']                = $requested['Artist'];
-      $requested['Copyright']              = $_POST["license"];
+      $requested['By-line']                = $requested['Artist'];
+
+      $requested['Copyright']              = $license;
       $requested['Rights']                 = $requested['Copyright'];
-      $requested['.Geo']                   = 'Nein';
+      $requested['CopyrightNotice']        = $requested['Copyright'];
+      // $requested['ProfileCopyright']       = ''; // not user specific
+
+      $requested['URL']                    = '';
+      $requested['WebStatement']           = $requested['URL'];
+      $requested['CreatorWorkURL']         = $requested['URL'];
+
+      $requested['?GPS']                   = 'Nein';
 
       //####################################################################
       // display picture attributes (EXIF) existing compared to requested
 
       echo '<h2>Eckdaten des <i>hochgeladenen</i> Bildes</h2>';
-      $fixed_size = exif_display($new_path, $requested); 
+      exif_display($new_path, $requested);
 
       //####################################################################
       // resize picture
 
+      $command =  $convert_command . ' ' . escapeshellarg($new_path) .
+                  ' -resize 2000x2000 ' . escapeshellarg($tmp_file);
+      exec($command, $data, $result);
+      if($debugging) { // debug
+        echo "<p>command: "; print_r($command);
+        echo "<br>data: <br><pre>"; print_r($data); echo "</pre>";
+        echo "<br>result: "; print_r($result);
+        echo "</p>";
+      }
+      if($result !== 0) {
+        die('Fehler bei der Größenänderung.');
+      }
+      if(unlink($new_path) == false) {
+        die('Fehler beim Löschen der alten Datei. (resize)');
+      }
+      if(rename($tmp_file, $new_path) == false) {
+        die('Fehler beim Umbennen der temporärern Datei. (resize)');
+      }
 
       //####################################################################
       // update picture EXIF to requested/required attributes
 
+      // TODO: implement retagging
 
       //####################################################################
       // display picture attributes (EXIF) existing compared to requested
@@ -135,9 +184,20 @@
 
       //####################################################################
       // display picture  and  furhter actions (buttons) to delete picture
-      // maybe directly send them to tim peters owncloud?
+      // IDEA: maybe directly send them to tim peters owncloud?
 
+      echo '<h2>Das überarbeitete Bild! </h2>';
+      echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600"></p> ';
+
+      // TODO: implement deletion
 
     ?>
+
+    <h2>Und nun?</h2>
+    <p>Nachdem du das Bild (mit einem Rechtsklick auf das Bild)
+       heruntergeladen hast, lädst du es wieder auf
+       <a href='https://upload.weeklypic.de/'>https://upload.weeklypic.de/</a> hoch. </p>
+    <p><a href="index.php">Hier geht es dann an den Anfang zurück.</a></p>
+
   </body>
 </html>
