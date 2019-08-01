@@ -6,6 +6,8 @@
   // from a $list of EXIF-tags (returned by exiftool -s) pick the first one
   // *starting* with $tag and return its value (after the colon, trimmed).
   // To get the exact tag add a space to $tag.
+  // If the $tag starts with a "." or "?" this will be removed bevore the search.
+  // If it started with a "?", "ja" will be returned if a tag was found, otherwise "nein"
     if(substr($tag,0,1) == '.') {  // Extra processing for Meta-Tag
       return exif_get_tag_value($list, substr($tag, 1));
     } elseif(substr($tag,0,1) == '?') {  // Extra processing for Meta-Tag yes/no
@@ -41,7 +43,8 @@
     //$exif_data = exif_read_data($new_path, "FILE,COMPUTED,ANY_TAG,IFDO,COMMENT,EXIF", true);
     //if($debugging == true) { print_r($exif_data); };
 
-    exec("/usr/local/bin/exiftool -s " . escapeshellarg($filename), $exif_data, $exiftool_result);
+    global $exiftool_command;
+    exec($exiftool_command . ' -s ' . escapeshellarg($filename), $exif_data, $exiftool_result);
     if(false == true) { // debug
       echo "<p>filename: "; print_r($filename);
       echo "<br>exif_data: <br><pre>"; print_r($exif_data); echo "</pre>";
@@ -60,8 +63,8 @@
       $requested['.ImageWidth']  = scale_to(2000, $pic_height, $pic_width);
       $requested['.ImageHeight'] = '2000';
     }
-    $requested['.ExifImageWidth']  = $requested['ImageWidth'];
-    $requested['.ExifImageHeight'] = $requested['ImageHeight'];
+    $requested['ExifImageWidth']  = $requested['.ImageWidth'];
+    $requested['ExifImageHeight'] = $requested['.ImageHeight'];
 
     // Display comparisom table
     // IDEA: Maybe its better to have a line by line compare on small displays?

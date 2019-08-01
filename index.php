@@ -34,30 +34,32 @@
 
     <p>
       <form action="doit.php" method="post" enctype="multipart/form-data">
-        Datei auswählen:
-        <input type="file" name="fileToUpload" id="fileToUpload" required>
-        <br/>
-        WeeklyPic-Benutzername:
-        <input type="text" id="user" name="user" required>
-        <br/>
-        Bild-Zeitraum (für den Dateinamen):<br>
+        <p>
+          Datei auswählen:<br/>
+          <input type="file" name="fileToUpload" id="fileToUpload" required>
+        </p>
+        <p>
+          WeeklyPic-Benutzername:<br/>
+          <input type="text" id="user" name="user" required><br/>
+          Bildbeschreibung (wird von WeeklyPic genutzt, optional):<br/>
+          <input type="text" id="description" name="description">
+        </p>
+        <!-- Bild-Zeitraum (für den Dateinamen):<br>
         <input type="radio" id="timeframe" name="timeframe" value="Woche" checked required>
         Woche <input type="number" name="week" min="1" max="52" step="1="><br>
         <input type="radio" id="timeframe" name="timeframe" value="Monat" required>
         Monat <input type="number" name="month" min="1" max="12" step="1="><br/>
-        Bildbeschreibung (wird von WeeklyPic genutzt, optional):
-        <input type="text" id="description" name="description">
-        <br/>
-        Urheber (optional):
-        <input type="text" id="creator" name="creator">
-        <br/>
-        Lizenz (optional):
-        <input type="text" id="license" name="license">
-        <br/>
-        <!-- Lösche Geo-Daten -->
-        <input type="checkbox" name="nogeo" value="nogeo"> Lösche Geo-Daten aus dem Bild.<br>
-        <br>
-        <input type="submit" value="Upload Image" name="submit">
+      -->
+        <p>
+          Urheber (optional):<br/>
+          <input type="text" id="creator" name="creator"><br/>
+          Lizenz (optional):<br/>
+          <input type="text" id="license" name="license"><br/>
+          <input type="checkbox" id="nogeo" name="nogeo" value="nogeo"> Lösche Geo-Daten aus dem Bild.<br>
+        </p>
+        <p>
+          <input type="submit" value="Bild hochladen und bearbeiten" name="submit">
+        </p>
       </form>
     </p>
 

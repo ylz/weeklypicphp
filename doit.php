@@ -20,8 +20,9 @@
 
     <?php
 
-      $debugging = true;
+      $debugging = false;
       $convert_command = '/usr/local/bin/convert';  // imagemagick covert
+      $exiftool_command = '/usr/local/bin/exiftool'; // EXIFtool
 
       include 'src/exif_parsing.php';
 
@@ -39,8 +40,15 @@
       $license = $_POST["license"];
       $description = $_POST["description"];
       $description_isset = false;
+      if(array_key_exists("nogeo", $_POST)){
+        $no_geo = true;
+      } else {
+        $no_geo = false;
+      }
+
       echo "<h1>Hallo! ❤️</h1>";
       echo "<p>Grüezi $user.</p>";
+
       if (!empty($description))
       {
         echo "<p>Dein Bild soll also <i>$description</i> heissen?</p>";
@@ -95,6 +103,7 @@
       // Pfad zum Upload
       // IDEA: Oder Name generiertem Dateinamen erstellen?
       $new_path = $upload_folder.$filename.'.'.$extension;
+      $tmp_file = $upload_folder.$filename.'_tmp.'.$extension;
 
       //Neuer Dateiname falls die Datei bereits existiert
       // IDEA: Oder bestehendes Bild überschreiben?
@@ -125,8 +134,8 @@
 
       $requested['.ImageWidth']            = '2000';
       $requested['.ImageHeight']           = '2000';
-      $requested['ExifImageWidth']         = $requested['ImageWidth'];
-      $requested['ExifImageHeight']        = $requested['ImageHeight'];
+      $requested['ExifImageWidth']         = $requested['.ImageWidth'];
+      $requested['ExifImageHeight']        = $requested['.ImageHeight'];
 
       $requested['Artist']                 = $creator;
       $requested['Creator']                = $requested['Artist'];
@@ -141,7 +150,7 @@
       $requested['WebStatement']           = $requested['URL'];
       $requested['CreatorWorkURL']         = $requested['URL'];
 
-      $requested['?GPS']                   = 'Nein';
+      $requested['?GPS']                   = $no_geo ? 'Nein' : 'Ja';
 
       //####################################################################
       // display picture attributes (EXIF) existing compared to requested
@@ -174,7 +183,34 @@
       //####################################################################
       // update picture EXIF to requested/required attributes
 
-      // TODO: implement retagging
+      // build exiftool commandline parameters
+      $et_param = ' ';
+      foreach($requested as $tag=>$tag_value) {
+        if($debugging and false) { echo "<p>TAG:$tag:VALUE:$tag_value:</p>"; }
+        if( (substr($tag,0,1) == '.') or (substr($tag,0,1) == '?') ) { continue; }
+        if( strlen($tag_value) == 0 ) { continue; }
+        $et_param = $et_param . ' -' . $tag . '=' . escapeshellarg($tag_value);
+      }
+      // remove GEO data
+      if($no_geo) {
+        $et_param = $et_param . ' -gps:all= -xmp:geotag= ';
+      }
+      // run command
+      if(strlen($et_param)==0) {
+        echo '<p>Keine Metadaten-Anpassung notwendig.<p>';
+      } else {
+        $command =  $exiftool_command . ' -s ' . $et_param . ' ' . escapeshellarg($new_path);
+        exec($command, $data, $result);
+        if($debugging) { // debug
+          echo "<p>command: "; print_r($command);
+          echo "<br>data: <br><pre>"; print_r($data); echo "</pre>";
+          echo "<br>result: "; print_r($result);
+          echo "</p>";
+        }
+        if($result !== 0) { echo '<p>Problem bei der Änderung der Metadataten aufgetreten.</p>'; }
+      }
+      // BUG: EXIFTOOL hinterläst eiene <$dateiname>_original Datei. Löschen oder gar nicht erst erstellen
+
 
       //####################################################################
       // display picture attributes (EXIF) existing compared to requested
