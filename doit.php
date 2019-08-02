@@ -20,7 +20,10 @@
 
     <?php
 
+      // some constans 
+
       $debugging = false;
+      $upload_folder = '_files/'; //Das Upload-Verzeichnis
       $convert_command = '/usr/local/bin/convert';  // imagemagick covert
       $exiftool_command = '/usr/local/bin/exiftool'; // EXIFtool
 
@@ -55,9 +58,15 @@
         $description_isset = true;
       }
 
+
+      //####################################################################
+      // Store common values cookies for next time, if requested
+      //$_COOKIE['varname'] = $var_value;
+
+
       //####################################################################
       // File Upload Handling
-      $upload_folder = '_files/'; //Das Upload-Verzeichnis
+
       $fileToUpload  = $_FILES["fileToUpload"];
       $file_basename = basename($fileToUpload["name"]);
       $upload_file   = $upload_folder . $file_basename;
@@ -199,7 +208,7 @@
       if(strlen($et_param)==0) {
         echo '<p>Keine Metadaten-Anpassung notwendig.<p>';
       } else {
-        $command =  $exiftool_command . ' -s ' . $et_param . ' ' . escapeshellarg($new_path);
+        $command =  $exiftool_command . ' -s -overwrite_original ' . $et_param . ' ' . escapeshellarg($new_path);
         exec($command, $data, $result);
         if($debugging) { // debug
           echo "<p>command: "; print_r($command);
@@ -209,7 +218,6 @@
         }
         if($result !== 0) { echo '<p>Problem bei der Änderung der Metadataten aufgetreten.</p>'; }
       }
-      // BUG: EXIFTOOL hinterläst eiene <$dateiname>_original Datei. Löschen oder gar nicht erst erstellen
 
 
       //####################################################################
@@ -226,14 +234,22 @@
       echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600"></p> ';
 
       // TODO: implement deletion
-
+      if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+      }
+      $_SESSION['filename'] = $new_path;
+      echo '<p>SID:' . SID . '</p><p>' . session_status() . '</p>';
     ?>
 
     <h2>Und nun?</h2>
     <p>Nachdem du das Bild (mit einem Rechtsklick auf das Bild)
        heruntergeladen hast, lädst du es wieder auf
-       <a href='https://upload.weeklypic.de/'>https://upload.weeklypic.de/</a> hoch. </p>
-    <p><a href="index.php">Hier geht es dann an den Anfang zurück.</a></p>
+       <a href='https://upload.weeklypic.de/' target="_blank">https://upload.weeklypic.de/</a> hoch. </p>
+    <p>Hier solltest du das Bild löschen. (Sonst wird es auch irgendwann später gelöscht.)</p>
+    <form method="post" action="final.php?<?php echo htmlspecialchars(SID); ?>">
+      <input type="submit" name="delete" value="Löschen" ?>
+      &nbsp;&nbsp;&nbsp;<input type="submit" name="nothing" value="Nix">  // test only
+    </form>
 
   </body>
 </html>
