@@ -1,3 +1,4 @@
+<?PHP session_start(); ?>
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -11,6 +12,7 @@
         -webkit-font-smoothing:antialiased;
         font-family:"Helvetica Neue",Helvetica,Arial,Verdana,sans-serif }
       h1,h2,h3 {line-height:1.2}
+      input {font-size:18px}
       table{ border-collapse: collapse; }
       th, td { padding: 3px;  text-align: left; }
       table, th, td { border: 1px solid black; }
@@ -20,7 +22,7 @@
 
     <?php
 
-      // some constans 
+      // some constans
 
       $debugging = false;
       $upload_folder = '_files/'; //Das Upload-Verzeichnis
@@ -233,12 +235,7 @@
       echo '<h2>Das überarbeitete Bild! </h2>';
       echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600"></p> ';
 
-      // TODO: implement deletion
-      if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-      }
       $_SESSION['filename'] = $new_path;
-      echo '<p>SID:' . SID . '</p><p>' . session_status() . '</p>';
     ?>
 
     <h2>Und nun?</h2>
@@ -248,7 +245,6 @@
     <p>Hier solltest du das Bild löschen. (Sonst wird es auch irgendwann später gelöscht.)</p>
     <form method="post" action="final.php?<?php echo htmlspecialchars(SID); ?>">
       <input type="submit" name="delete" value="Löschen" ?>
-      &nbsp;&nbsp;&nbsp;<input type="submit" name="nothing" value="Nix">  // test only
     </form>
 
   </body>
