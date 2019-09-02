@@ -20,21 +20,10 @@
   	<h1>Fertig! 😀</h1>
 
     <?php
+      include 'src/functions.php';          
       $filename = $_SESSION['filename'];
       if (isset($_POST['delete'])) { // delete button was klicked
-        if(file_exists($filename)) {
-          if(unlink($filename) == false) {
-            echo '<p>⚠️ Fehler beim Löschen der Bild-Datei. (1)</p>';
-          } else {
-            if(file_exists($filename)) {
-              echo '<p>⚠️ Fehler beim Löschen der Bild-Datei. (2)</p>';
-            } else {
-              echo '<p>♻️ Dein Bild wurde vom Server gelöscht.</p>';
-            }
-          }
-        } else {
-          echo '<p>⚠️ Die zu löschende Bild-Datei existiert nicht. 🤔</p>';
-        }
+        delete_file($filename);
       }
     ?>
 

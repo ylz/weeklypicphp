@@ -24,26 +24,26 @@
 
       // some constans
 
-      $debugging = false;
+      $debugging = FALSE;
+
       $upload_folder = '_files/'; //Das Upload-Verzeichnis
       $convert_command = '/usr/local/bin/convert';  // imagemagick covert
       $exiftool_command = '/usr/local/bin/exiftool'; // EXIFtool
 
+      include 'src/functions.php';
       include 'src/exif_parsing.php';
 
-      // TODO: replace "die" with function and flag to keep HTML result clean and offer a link back.
-      // IDEA: generate filename from parameters (week/month, w/m-number, Weekly-Pic-Name)
       // IDEA: validate picture date against parameters week/month and w/m-number
 
       //####################################################################
       // _POST Var Handling
 
-      // TODO: Harden _POST values (Restrict to certain characters)
+      // IDEA: Restrict $user to  characters? [a-z,A-Z,_,0-9]
 
-      $user = $_POST["user"];
-      $creator = $_POST["creator"];
-      $license = $_POST["license"];
-      $description = $_POST["description"];
+      $user         = sanitize_input("user", TRUE);
+      $creator      = sanitize_input("creator", FALSE);
+      $license      = sanitize_input("license", FALSE);
+      $description  = sanitize_input("description", FALSE);
       $description_isset = false;
       if(array_key_exists("nogeo", $_POST)){
         $no_geo = true;
@@ -65,6 +65,21 @@
       // Store common values cookies for next time, if requested
       //$_COOKIE['varname'] = $var_value;
 
+      // delete cookie if no storing requested (in case there was a cookie before)
+
+
+      //####################################################################
+      // generate filename from parameters
+
+      if(empty($user)) {
+        cancel_processing("Fehler! Kein Benutzer angegeben.");
+      }
+
+      if($_POST["timeframe"] == "Monat") {
+        $filename = 'm_' . validate_number_and_return_string(sanitize_input("month_number", TRUE), 1, 12) . '_' . $user ;
+      } else { // asume Woche
+        $filename = 'w_' . validate_number_and_return_string(sanitize_input("week_number", TRUE), 1, 52) . '_' . $user ;
+      }
 
       //####################################################################
       // File Upload Handling
@@ -72,7 +87,7 @@
       $fileToUpload  = $_FILES["fileToUpload"];
       $file_basename = basename($fileToUpload["name"]);
       $upload_file   = $upload_folder . $file_basename;
-      $filename      = pathinfo($fileToUpload['name'], PATHINFO_FILENAME);
+      // $filename      = pathinfo($fileToUpload['name'], PATHINFO_FILENAME);
       if($debugging == true) {
         echo "<p>file name: " .      $filename ;
         echo "<br>file type: " .     $fileToUpload["type"];
@@ -85,13 +100,13 @@
       $extension = strtolower(pathinfo($upload_file, PATHINFO_EXTENSION));
       $allowed_extensions = array('png', 'jpg', 'jpeg', 'JPG', 'JPEG');
       if(!in_array($extension, $allowed_extensions)) {
-        die("Ungültige Dateiendung.");
+        cancel_processing("Fehler! Ungültige Dateiendung.");
       }
 
       //Überprüfung der Dateigröße
       $max_size = 10000*1024; //10MB
       if($_FILES['fileToUpload']['size'] > $max_size) {
-        die("Bitte keine Dateien größer 10 MB hochladen");
+        cancel_processing("Bitte keine Dateien größer 10 MB hochladen.");
       }
 
       //Überprüfung dass das Bild keine Fehler enthält
@@ -104,27 +119,29 @@
           echo "<br>detected type: " . $detected_type . "</p>";
         }
         if(!in_array($detected_type, $allowed_types)) {
-          die("Nur der Upload von Bilddateien ist gestattet. Du verwendest $detected_type .");
+          cancel_processing("Nur der Upload von Bilddateien ist gestattet. Du verwendest $detected_type .");
         }
       }
       else {
-        die("No PHP-EXIF functions");
+        cancel_processing("Fehler! Keine PHP-EXIF functions verfügbar. Bitte Admins informieren!");
       }
 
       // Pfad zum Upload
-      // IDEA: Oder Name generiertem Dateinamen erstellen?
       $new_path = $upload_folder.$filename.'.'.$extension;
       $tmp_file = $upload_folder.$filename.'_tmp.'.$extension;
 
-      //Neuer Dateiname falls die Datei bereits existiert
-      // IDEA: Oder bestehendes Bild überschreiben?
-      if(file_exists($new_path)) { //Falls Datei existiert, hänge eine Zahl an den Dateinamen
-        $id = 1;
-        do {
-          $new_path = $upload_folder.$filename.'_'.$id.'.'.$extension;
-          $tmp_file = $upload_folder.$filename.'_'.$id.'_tmp.'.$extension;
-          $id++;
-        } while(file_exists($new_path));
+      // delete existing file(s)
+      if(file_exists($new_path)) {
+        echo "<p>Bereits vorhandenes Bild wird gelöscht.</p>";
+        if(!delete_file($new_path)) {
+          cancel_processing("Fehler! Konnte vorhandene Datei nicht löschen. Bitte Admins informieren!");
+        }
+      }
+      if(file_exists($tmp_file)) {
+        echo "<p>Bereits vorhandenes Bild (tmp) wird gelöscht.</p>";
+        if(!delete_file($tmp_file)) {
+          cancel_processing("Fehler! Konnte vorhandene Datei nicht löschen. Bitte Admins informieren!");
+        }
       }
 
       //Alles okay, verschiebe Datei an neuen Pfad
@@ -147,6 +164,7 @@
       $requested['.ImageHeight']           = '2000';
       $requested['ExifImageWidth']         = $requested['.ImageWidth'];
       $requested['ExifImageHeight']        = $requested['.ImageHeight'];
+      $requested['Orientation']            = '';
 
       $requested['Artist']                 = $creator;
       $requested['Creator']                = $requested['Artist'];
@@ -182,13 +200,13 @@
         echo "</p>";
       }
       if($result !== 0) {
-        die('Fehler bei der Größenänderung.');
+        cancel_processing('Fehler bei der Größenänderung.');
       }
       if(unlink($new_path) == false) {
-        die('Fehler beim Löschen der alten Datei. (resize)');
+        cancel_processing('Fehler beim Löschen der alten Datei. (resize)');
       }
       if(rename($tmp_file, $new_path) == false) {
-        die('Fehler beim Umbennen der temporärern Datei. (resize)');
+        cancel_processing('Fehler beim Umbennen der temporärern Datei. (resize)');
       }
 
       //####################################################################

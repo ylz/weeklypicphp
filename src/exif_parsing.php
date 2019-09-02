@@ -1,7 +1,5 @@
 <?php
 
-  // TODO: check that this include is not readable from browser (hardening), maybe use .htaccess
-
   function exif_get_tag_value($list, $tag) {
   // from a $list of EXIF-tags (returned by exiftool -s) pick the first one
   // *starting* with $tag and return its value (after the colon, trimmed).
@@ -51,7 +49,7 @@
       echo "<br>exiftool_result: "; print_r($exiftool_result);
       echo "</p>";
     }
-    if($exiftool_result !== 0) { die('Fehler beim Aufruf des EXIF-Tools!'); }
+    if($exiftool_result !== 0) { cancel_processing('Fehler beim Aufruf des EXIF-Tools!'); }
 
     // Calculate new size
     $pic_width  = exif_get_tag_value($exif_data, 'ImageWidth');

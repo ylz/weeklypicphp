@@ -30,6 +30,7 @@
 
     <?PHP
       // IDEA: use cookies to store common values (Weekly-Pic-Name, Author, license)
+      // IDEA: set default week and month numbers
     ?>
 
     <p>
@@ -44,12 +45,13 @@
           Bildbeschreibung (wird von WeeklyPic genutzt, optional):<br/>
           <input type="text" id="description" name="description">
         </p>
-        <!-- Bild-Zeitraum (für den Dateinamen):<br>
-        <input type="radio" id="timeframe" name="timeframe" value="Woche" checked required>
-        Woche <input type="number" name="week" min="1" max="52" step="1="><br>
-        <input type="radio" id="timeframe" name="timeframe" value="Monat" required>
-        Monat <input type="number" name="month" min="1" max="12" step="1="><br/>
-      -->
+        <p>
+          Bild-Zeitraum (für den Dateinamen):<br>
+          <input type="radio" id="timeframe" name="timeframe" value="Woche" checked required>
+          Woche <input type="number" name="week_number" min="1" max="52" step="1="><br>
+          <input type="radio" id="timeframe" name="timeframe" value="Monat" required>
+          Monat <input type="number" name="month_number" min="1" max="12" step="1="><br/>
+        </p>
         <p>
           Urheber (optional):<br/>
           <input type="text" id="creator" name="creator"><br/>
