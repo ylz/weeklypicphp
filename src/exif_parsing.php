@@ -65,7 +65,6 @@
     $requested['ExifImageHeight'] = $requested['.ImageHeight'];
 
     // Display comparisom table
-    // IDEA: Maybe its better to have a line by line compare on small displays?
     echo '<p><table style="border:1">';
     echo "<tr><th>EXIF Tag</th><th>aktuell</th><th>soll</th><th>?</th></tr>";
     foreach($requested as $exif_tag=>$exif_value) {

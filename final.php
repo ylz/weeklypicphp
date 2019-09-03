@@ -20,7 +20,10 @@
   	<h1>Fertig! 😀</h1>
 
     <?php
-      include 'src/functions.php';          
+      // configuration constants
+      include 'src/config.php';
+      
+      include 'src/functions.php';
       $filename = $_SESSION['filename'];
       if (isset($_POST['delete'])) { // delete button was klicked
         delete_file($filename);

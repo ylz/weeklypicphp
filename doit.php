@@ -1,4 +1,36 @@
-<?PHP session_start(); ?>
+<?PHP
+  // configuration constants
+  include 'src/config.php';
+
+  include 'src/functions.php';
+  include 'src/exif_parsing.php';
+
+  // session (must be handled before any html code)
+  session_start();
+
+  // _POST Var Handling
+  // IDEA: Restrict $user to  characters? [a-z,A-Z,_,0-9]
+  $user         = sanitize_input("user", TRUE);
+  $creator      = sanitize_input("creator", FALSE);
+  $license      = sanitize_input("license", FALSE);
+  $description  = sanitize_input("description", FALSE);
+  $description_isset = false;
+  if(array_key_exists("nogeo", $_POST)){
+    $no_geo = true;
+  } else {
+    $no_geo = false;
+  }
+
+  // cookie (must be handled before any html code)
+  if(array_key_exists("usecookie", $_POST)) {
+    $cookie_value = implode( $cookie_split, array($user, $creator, $license) );
+    setcookie($cookie_name, $cookie_value, $cookie_expires, "/");
+  } else { // delete cookie
+    $cookie_value = '';
+    setcookie($cookie_name, $cookie_value, 1, "/");
+  }
+
+?>
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -22,44 +54,29 @@
 
     <?php
 
-      // some constans
-
-      $debugging = FALSE;
-
-      $upload_folder = '_files/'; //Das Upload-Verzeichnis
-      $convert_command = '/usr/local/bin/convert';  // imagemagick covert
-      $exiftool_command = '/usr/local/bin/exiftool'; // EXIFtool
-
-      include 'src/functions.php';
-      include 'src/exif_parsing.php';
-
       // IDEA: validate picture date against parameters week/month and w/m-number
 
       //####################################################################
-      // _POST Var Handling
-
-      // IDEA: Restrict $user to  characters? [a-z,A-Z,_,0-9]
-
-      $user         = sanitize_input("user", TRUE);
-      $creator      = sanitize_input("creator", FALSE);
-      $license      = sanitize_input("license", FALSE);
-      $description  = sanitize_input("description", FALSE);
-      $description_isset = false;
-      if(array_key_exists("nogeo", $_POST)){
-        $no_geo = true;
-      } else {
-        $no_geo = false;
-      }
 
       echo "<h1>Hallo! ❤️</h1>";
       echo "<p>Grüezi $user.</p>";
 
       if (!empty($description))
       {
-        echo "<p>Dein Bild soll also <i>$description</i> heissen?</p>";
+        echo "<p>Dein Bild soll also <i>$description</i> heissen?!</p>";
         $description_isset = true;
       }
 
+      if($debugging == TRUE) {
+        echo "<p>";
+        echo "debugging: " . $debugging . '<br/>';
+        echo "cookie_value: " . $cookie_value . '<br/>';
+        echo "cookie_name: " . $cookie_name  . '<br/>';
+        echo "cookie_expires: " . $cookie_expires . '<br/>';
+        echo "convert command: " . $convert_command . '<br/>';
+        echo "exiftool command: " . $exiftool_command ;
+        echo '</p>' ;
+      }
 
       //####################################################################
       // Store common values cookies for next time, if requested
@@ -81,8 +98,9 @@
         $filename = 'w_' . validate_number_and_return_string(sanitize_input("week_number", TRUE), 1, 52) . '_' . $user ;
       }
 
+
       //####################################################################
-      // File Upload Handling
+      // File validation and upload handling
 
       $fileToUpload  = $_FILES["fileToUpload"];
       $file_basename = basename($fileToUpload["name"]);
@@ -93,6 +111,7 @@
         echo "<br>file type: " .     $fileToUpload["type"];
         echo "<br>file tmp name: " . $fileToUpload["tmp_name"];
         echo "<br>file basename:     $file_basename";
+        echo "<br>log file:          $command_log";
         echo "<br>upload filename:   $upload_file</p>";
       }
 
@@ -148,6 +167,7 @@
       move_uploaded_file($fileToUpload['tmp_name'], $new_path);
       echo 'Bild erfolgreich hochgeladen: <a href="'.$new_path.'">'.$new_path.'</a>';
 
+
       //####################################################################
       // generate requestet EXIF values
 
@@ -181,17 +201,20 @@
 
       $requested['?GPS']                   = $no_geo ? 'Nein' : 'Ja';
 
+
       //####################################################################
       // display picture attributes (EXIF) existing compared to requested
 
       echo '<h2>Eckdaten des <i>hochgeladenen</i> Bildes</h2>';
       exif_display($new_path, $requested);
 
+
       //####################################################################
       // resize picture
 
       $command =  $convert_command . ' ' . escapeshellarg($new_path) .
-                  ' -resize 2000x2000 ' . escapeshellarg($tmp_file);
+                  ' -resize 2000x2000 ' . escapeshellarg($tmp_file) .
+                  ' 2>&1';
       exec($command, $data, $result);
       if($debugging) { // debug
         echo "<p>command: "; print_r($command);
@@ -200,6 +223,7 @@
         echo "</p>";
       }
       if($result !== 0) {
+        log_command_result($command, $result, $data);
         cancel_processing('Fehler bei der Größenänderung.');
       }
       if(unlink($new_path) == false) {
@@ -208,6 +232,7 @@
       if(rename($tmp_file, $new_path) == false) {
         cancel_processing('Fehler beim Umbennen der temporärern Datei. (resize)');
       }
+
 
       //####################################################################
       // update picture EXIF to requested/required attributes
@@ -228,7 +253,8 @@
       if(strlen($et_param)==0) {
         echo '<p>Keine Metadaten-Anpassung notwendig.<p>';
       } else {
-        $command =  $exiftool_command . ' -s -overwrite_original ' . $et_param . ' ' . escapeshellarg($new_path);
+        $command =  $exiftool_command . ' -v2 -s -overwrite_original ' . $et_param .
+                    ' ' . escapeshellarg($new_path) . ' 2>&1';
         exec($command, $data, $result);
         if($debugging) { // debug
           echo "<p>command: "; print_r($command);
@@ -236,7 +262,10 @@
           echo "<br>result: "; print_r($result);
           echo "</p>";
         }
-        if($result !== 0) { echo '<p>Problem bei der Änderung der Metadataten aufgetreten.</p>'; }
+        if($result !== 0) {
+          log_command_result($command, $result, $data);
+          echo '<p>⚠️ Problem bei der Änderung der Metadataten aufgetreten.</p>';
+        }
       }
 
 
@@ -248,7 +277,7 @@
 
       //####################################################################
       // display picture  and  furhter actions (buttons) to delete picture
-      // IDEA: maybe directly send them to tim peters owncloud?
+      // IDEA: maybe send picture direct to tim peters owncloud?
 
       echo '<h2>Das überarbeitete Bild! </h2>';
       echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600"></p> ';

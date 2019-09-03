@@ -1,2 +1,2 @@
-# sym-link this file to .htaccess
+# sym-link or copy this file to .htaccess
 deny from all
