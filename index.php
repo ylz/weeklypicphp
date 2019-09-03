@@ -29,8 +29,25 @@
        ich weder Garantie noch Haftung.</p>
 
     <?PHP
-      // IDEA: use cookies to store common values (Weekly-Pic-Name, Author, license)
+      // configuration constants
+      include 'src/config.php';
+
+      // read cookie storing common values (Weekly-Pic-Name, Creator, license)
+      if(isset($_COOKIE[$cookie_name])) {
+        $cookie_value  = explode( $cookie_split , $_COOKIE[$cookie_name] , 3 );
+        $val_user      = $cookie_value[0];
+        $val_creator   = $cookie_value[1];
+        $val_license   = $cookie_value[2];
+        $val_usecookie = ' checked ';
+      } else {
+        $val_user      = '';
+        $val_creator   = '';
+        $val_license   = '';
+        $val_usecookie = ' ';
+      }
+
       // IDEA: set default week and month numbers
+
     ?>
 
     <p>
@@ -40,8 +57,8 @@
           <input type="file" name="fileToUpload" id="fileToUpload" required>
         </p>
         <p>
-          WeeklyPic-Benutzername:<br/>
-          <input type="text" id="user" name="user" required><br/>
+          WeeklyPic-Benutzername △:<br/>
+          <input type="text" id="user" name="user" value="<?= $val_user ?>" required><br/>
           Bildbeschreibung (wird von WeeklyPic genutzt, optional):<br/>
           <input type="text" id="description" name="description">
         </p>
@@ -53,11 +70,14 @@
           Monat <input type="number" name="month_number" min="1" max="12" step="1="><br/>
         </p>
         <p>
-          Urheber (optional):<br/>
-          <input type="text" id="creator" name="creator"><br/>
-          Lizenz (optional):<br/>
-          <input type="text" id="license" name="license"><br/>
+          Urheber △ (optional):<br/>
+          <input type="text" id="creator" name="creator" value="<?= $val_creator ?>"><br/>
+          Lizenz △ (optional):<br/>
+          <input type="text" id="license" name="license" value="<?= $val_license ?>"><br/>
           <input type="checkbox" id="nogeo" name="nogeo" value="nogeo"> Lösche Geo-Daten aus dem Bild.<br>
+        </p>
+        <p>
+          <input type="checkbox" id="usecookie" name="usecookie" value="usecookie" <?= $val_usecookie ?> > Nutze ein Cookie für deine △-Daten.
         </p>
         <p>
           <input type="submit" value="Bild hochladen und bearbeiten" name="submit">

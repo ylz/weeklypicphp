@@ -2,7 +2,7 @@
 
   // Processing is stoped with "die", closing <body> and <hmtl> tags.
   function cancel_processing($msg) {
-    echo "<p><strong>⚠️ " . $msg . "</strong><br/>";
+    echo "<p><strong>🛑 " . $msg . "</strong><br/>";
     echo "<em>Die Verarbeitung wird abgebrochen.</em></p>";
     echo '<p>Gehe an den <a href="index.php">Anfang</a> zurück um es noch einmal zu probieren.</p>';
     echo '</body></hmtl>';
@@ -55,5 +55,15 @@
     }
   }
 
+  function log_command_result($cmd, $result, $output) {
+    global $command_log;
+    $log_msg = PHP_EOL . 'time:' . date("F j, Y, g:i a") . PHP_EOL .
+               'command: ' . $cmd . PHP_EOL . 'result: ' . $result . PHP_EOL .
+               'output:' . PHP_EOL . print_r($output, TRUE) . PHP_EOL .
+               '-- END --' . PHP_EOL . PHP_EOL ;
+    if(file_put_contents($command_log, $log_msg, FILE_APPEND) === FALSE) {
+      echo "<p>⚠️ Problem bei Fehler-Log $command_log schreiben</p>";
+    }
+  }
 
 ?>

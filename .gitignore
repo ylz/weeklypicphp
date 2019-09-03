@@ -2,3 +2,4 @@
 .DS_Store
 _files/*.jpg
 _files/*.jpeg
+*.log
