@@ -4,15 +4,30 @@
   // from a $list of EXIF-tags (returned by exiftool -s) pick the first one
   // *starting* with $tag and return its value (after the colon, trimmed).
   // To get the exact tag add a space to $tag.
-  // If the $tag starts with a "." or "?" this will be removed bevore the search.
-  // If it started with a "?", "ja" will be returned if a tag was found, otherwise "nein"
+  // If the $tag starts with a ".", "=" or "?" this will be removed bevore the search.
+  // If it starts with a "?", $tag_is_set will be returned if a tag was found, otherwise $tag_not_set
+  // If it starts with a "=", it's value is calculated
+    global $tag_is_set;
+    global $tag_not_set;
     if(substr($tag,0,1) == '.') {  // Extra processing for Meta-Tag
       return exif_get_tag_value($list, substr($tag, 1));
     } elseif(substr($tag,0,1) == '?') {  // Extra processing for Meta-Tag yes/no
       if(exif_get_tag_value($list, substr($tag, 1)) !== '') {
-        return 'Ja';
+        return $tag_is_set;
       } else {
-        return 'Nein';
+        return $tag_not_set;
+      }
+    } elseif(substr($tag,0,1) == '=') {  // will be calculated
+      // ToDo: calulation of values starting with =
+      switch ($tag) {
+        case '=Month':
+            return date('n', strtotime(exif_get_tag_value($list, 'CreateDate'))); // REVIEW: is this secure/stable?
+            break;
+        case '=Week':
+            return date('W', strtotime(exif_get_tag_value($list, 'CreateDate'))); // REVIEW: is this secure/stable?
+            break;
+        default:
+            return 'n/a';
       }
     } else {
       foreach($list as $line) {
