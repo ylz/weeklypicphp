@@ -22,10 +22,11 @@
   }
 
   // cookie (must be handled before any html code)
+  // Store common values cookies for next time, if requested
   if(array_key_exists("usecookie", $_POST)) {
     $cookie_value = implode( $cookie_split, array($user, $creator, $license) );
     setcookie($cookie_name, $cookie_value, $cookie_expires, "/");
-  } else { // delete cookie
+  } else { // delete cookie if no storing requested (in case there was a cookie before)
     $cookie_value = '';
     setcookie($cookie_name, $cookie_value, 1, "/");
   }
@@ -48,6 +49,7 @@
       table{ border-collapse: collapse; }
       th, td { padding: 3px;  text-align: left; }
       table, th, td { border: 1px solid black; }
+      img { image-orientation: from-image; }
     </style>
   </head>
   <body>
@@ -78,12 +80,6 @@
         echo '</p>' ;
       }
 
-      //####################################################################
-      // Store common values cookies for next time, if requested
-      //$_COOKIE['varname'] = $var_value;
-
-      // delete cookie if no storing requested (in case there was a cookie before)
-
 
       //####################################################################
       // generate filename from parameters
@@ -92,10 +88,12 @@
         cancel_processing("Fehler! Kein Benutzer angegeben.");
       }
 
+      $requested_month = validate_number_and_return_string(sanitize_input("month_number", TRUE), 1, 12);
+      $requested_week  = validate_number_and_return_string(sanitize_input("week_number", TRUE), 1, 52);
       if($_POST["timeframe"] == "Monat") {
-        $filename = 'm_' . validate_number_and_return_string(sanitize_input("month_number", TRUE), 1, 12) . '_' . $user ;
+        $filename = 'm_' . $requested_month . '_' . $user ;
       } else { // asume Woche
-        $filename = 'w_' . validate_number_and_return_string(sanitize_input("week_number", TRUE), 1, 52) . '_' . $user ;
+        $filename = 'w_' . $requested_week . '_' . $user ;
       }
 
 
@@ -171,6 +169,12 @@
       //####################################################################
       // generate requestet EXIF values
 
+      // values might start with a special character wich have the folowwing rules:
+      // . : value is only displayed
+      // = : value is calculated (and displayed)
+      // ? : only the existance of this value is displayed as $tag_is_set or $tag_not_set
+      // any other character : value will be set using the exiftool
+
       $requested['.FileName']              = '';
 
       $requested['Title']                  = $description;
@@ -184,7 +188,7 @@
       $requested['.ImageHeight']           = '2000';
       $requested['ExifImageWidth']         = $requested['.ImageWidth'];
       $requested['ExifImageHeight']        = $requested['.ImageHeight'];
-      $requested['Orientation']            = '';
+      $requested['.Orientation']           = '';
 
       $requested['Artist']                 = $creator;
       $requested['Creator']                = $requested['Artist'];
@@ -195,12 +199,18 @@
       $requested['CopyrightNotice']        = $requested['Copyright'];
       // $requested['ProfileCopyright']       = ''; // not user specific
 
-      $requested['URL']                    = '';
-      $requested['WebStatement']           = $requested['URL'];
-      $requested['CreatorWorkURL']         = $requested['URL'];
+      $requested['.URL']                   = '';
+      $requested['.WebStatement']          = $requested['.URL'];
+      $requested['.CreatorWorkURL']        = $requested['.URL'];
 
-      $requested['?GPS']                   = $no_geo ? 'Nein' : 'Ja';
+      $requested['?GPS']                   = $no_geo ? $tag_not_set : $tag_is_set;
 
+      $requested['.CreateDate']            = '';
+      $requested['=Month']                 = $requested_month;
+      $requested['=Week']                  = $requested_week;
+      // IDEA: Calculate and check the date-range inbetween the foto should have been made
+      // $requested['=DateFrom']              = '';  // The date-range inbetween
+      // $requested['=DateTo']                = '';  // the foto should have been made
 
       //####################################################################
       // display picture attributes (EXIF) existing compared to requested
@@ -241,7 +251,7 @@
       $et_param = ' ';
       foreach($requested as $tag=>$tag_value) {
         if($debugging and false) { echo "<p>TAG:$tag:VALUE:$tag_value:</p>"; }
-        if( (substr($tag,0,1) == '.') or (substr($tag,0,1) == '?') ) { continue; }
+        if( (substr($tag,0,1) == '.') or (substr($tag,0,1) == '?') or (substr($tag,0,1) == '=') ) { continue; }
         if( strlen($tag_value) == 0 ) { continue; }
         $et_param = $et_param . ' -' . $tag . '=' . escapeshellarg($tag_value);
       }
@@ -253,6 +263,8 @@
       if(strlen($et_param)==0) {
         echo '<p>Keine Metadaten-Anpassung notwendig.<p>';
       } else {
+        // exiftool -s = very short output
+        //          -v = verbose output
         $command =  $exiftool_command . ' -v2 -s -overwrite_original ' . $et_param .
                     ' ' . escapeshellarg($new_path) . ' 2>&1';
         exec($command, $data, $result);
@@ -280,7 +292,8 @@
       // IDEA: maybe send picture direct to tim peters owncloud?
 
       echo '<h2>Das überarbeitete Bild! </h2>';
-      echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600"></p> ';
+      echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600" ><br />';
+      echo '<small>Falls dein Bild gedreht dargestellt wird, berücksichtigt dein Browser den Style "image-orientation: from-image;" nicht. Das sollte allerdings kein Problem sein.</small></p>';
 
       $_SESSION['filename'] = $new_path;
     ?>

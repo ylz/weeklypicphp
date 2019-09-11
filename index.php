@@ -46,7 +46,9 @@
         $val_usecookie = ' ';
       }
 
-      // IDEA: set default week and month numbers
+      // set default week and month numbers
+      $default_month = date('n');
+      $default_week  = date('W');
 
     ?>
 
@@ -65,9 +67,9 @@
         <p>
           Bild-Zeitraum (für den Dateinamen):<br>
           <input type="radio" id="timeframe" name="timeframe" value="Woche" checked required>
-          Woche <input type="number" name="week_number" min="1" max="52" step="1="><br>
+          Woche <input type="number" name="week_number" min="1" max="52" step="1=" value="<?= $default_week ?>"><br>
           <input type="radio" id="timeframe" name="timeframe" value="Monat" required>
-          Monat <input type="number" name="month_number" min="1" max="12" step="1="><br/>
+          Monat <input type="number" name="month_number" min="1" max="12" step="1=" value="<?= $default_month ?>"><br/>
         </p>
         <p>
           Urheber △ (optional):<br/>
