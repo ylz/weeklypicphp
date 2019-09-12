@@ -56,7 +56,10 @@
 
     <?php
 
-      // IDEA: validate picture date against parameters week/month and w/m-number
+      // IDEA: validate picture date against requested week/month and year
+      // Maybe calculate and check the date-range inbetween the foto should have been made
+      // $requested['=DateFrom']              = '';  // The date-range inbetween
+      // $requested['=DateTo']                = '';  // the foto should have been made
 
       //####################################################################
 
@@ -208,9 +211,7 @@
       $requested['.CreateDate']            = '';
       $requested['=Month']                 = $requested_month;
       $requested['=Week']                  = $requested_week;
-      // IDEA: Calculate and check the date-range inbetween the foto should have been made
-      // $requested['=DateFrom']              = '';  // The date-range inbetween
-      // $requested['=DateTo']                = '';  // the foto should have been made
+
 
       //####################################################################
       // display picture attributes (EXIF) existing compared to requested
@@ -295,17 +296,22 @@
       echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600" ><br />';
       echo '<small>Falls dein Bild gedreht dargestellt wird, berücksichtigt dein Browser den Style "image-orientation: from-image;" nicht. Das sollte allerdings kein Problem sein.</small></p>';
 
-      $_SESSION['filename'] = $new_path;
+      $_SESSION['pathfilename'] = $new_path;
+      $_SESSION['filebasename'] = $filename;
+
     ?>
 
     <h2>Und nun?</h2>
-    <p>Nachdem du das Bild (mit einem Rechtsklick auf das Bild)
-       heruntergeladen hast, lädst du es wieder auf
-       <a href='https://upload.weeklypic.de/' target="_blank">https://upload.weeklypic.de/</a> hoch. </p>
-    <p>Hier solltest du das Bild löschen. (Sonst wird es auch irgendwann später gelöscht.)</p>
-    <form method="post" action="final.php?<?php echo htmlspecialchars(SID); ?>">
-      <input type="submit" name="delete" value="Löschen" ?>
-    </form>
+    <p>Hier kannst du das Bild nun dirket zum WeeklyPic-Upload senden und hier löschen.<br>
+       Sollte dir das Ergebnis hier nicht gefallen, solltest du das Bild hier löschen. (Sonst wird es auch irgendwann später gelöscht.)</p>
+    <p><form method="post" action="final.php?<?php echo htmlspecialchars(SID); ?>">
+      <input type="submit" name="upload" value="hochladen und löschen" ?>
+      <input type="submit" name="delete" value="löschen" ?>&nbsp;&nbsp;&nbsp;
+    </form></p>
+    <p>Alternativ kannst du das Bild (mit einem Rechtsklick auf das Bild)
+       heruntergeladen und wieder auf
+       <a href='https://upload.weeklypic.de/' target="_blank">https://upload.weeklypic.de/</a>
+       hochladen.</p>
 
   </body>
 </html>

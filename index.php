@@ -19,14 +19,19 @@
   	<h1>Hallo! ❤️</h1>
     <p>Hier kannst du einfach dein Wochen- oder Monatsbild skalieren auf
        2048 Pixel (lange Kante) und deine EXIF Beschreibung als Tag setzen.
-       Das Ergebnis lädst du auf dein Gerät wieder herunter und danach auf
+       Das Ergebnis kannst du von hier direkt auf Upload.WeeklyPic.de
+       hochladen lassen, oder einfach herunterladen und danach selbst auf
        <a href='https://upload.weeklypic.de/'>https://upload.weeklypic.de/</a>
-       hoch.</p>
-    <p>Disclaimer: Ja, die Bilder werden zumindest aktuell noch auf diesem
-       Server hier gespeichert und sind mit dem selbem Passwort geschützt
-       abrufbar. Ich lösche die Bilder periodisch von Hand. Für die
-       Funktionalität der Script und auch die Verfügbarkeit übernehme
+       hochladen, wenn du möchtest.</p>
+    <h3>Disclaimer</h3>
+    <p>Die Bilder, die nicht gelöscht wurden, werden periodisch von Hand gelöscht.<br>
+       Der Webserver protokolliert Zugriffe auf die Seite.
+       Auch Fehler die bei der Konvertierung auftauchen werden protokolliert,
+       um Fehler suchen zu können.<br />
+       Für die Funktionalität der Anwendung und auch die Verfügbarkeit übernehme
        ich weder Garantie noch Haftung.</p>
+    <hr />
+    <h3>Dein Bild und Eckdaten</h3>
 
     <?PHP
       // configuration constants
@@ -50,12 +55,15 @@
       $default_month = date('n');
       $default_week  = date('W');
 
+      // TODO: Hint about logging
+      // IDEA: general footer with Authors and link to github
+
     ?>
 
     <p>
       <form action="doit.php" method="post" enctype="multipart/form-data">
         <p>
-          Datei auswählen:<br/>
+          Bild-Datei auswählen:<br/>
           <input type="file" name="fileToUpload" id="fileToUpload" required>
         </p>
         <p>

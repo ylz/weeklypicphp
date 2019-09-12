@@ -22,12 +22,22 @@
     <?php
       // configuration constants
       include 'src/config.php';
-      
+      // more functions
       include 'src/functions.php';
-      $filename = $_SESSION['filename'];
-      if (isset($_POST['delete'])) { // delete button was klicked
-        delete_file($filename);
+
+      // get values from Session
+      $pathfilename = $_SESSION['pathfilename'];
+      $filebasename = $_SESSION['filebasename'];
+
+      // upload
+      if (isset($_POST['upload'])) { // upload button was klicked
+      // $curl_command . ' -u ' . $upload_login . ' -X PUT --data-binary @"' . $pathfilename . '" "' . $upload_server . $filebasename . '"';
+        echo '<p>✅ Das Bild wurde hochgeladen! 😃</p>';
       }
+
+      // delete - always
+      delete_file($pathfilename);
+
     ?>
 
     <p>Sollte etwas nicht wie erwartet funktionieren, informiere bitte den Admin dieses Servers.</p>
