@@ -87,6 +87,7 @@
       //####################################################################
       // generate filename from parameters
 
+      log_usage('2', $user);
       if(empty($user)) {
         cancel_processing("Fehler! Kein Benutzer angegeben.");
       }
@@ -289,15 +290,17 @@
       exif_display($new_path, $requested);
 
       //####################################################################
-      // display picture  and  furhter actions (buttons) to delete picture
-      // IDEA: maybe send picture direct to tim peters owncloud?
+      // display picture  and  furhter actions (buttons) to delete (and upload) picture
 
       echo '<h2>Das überarbeitete Bild! </h2>';
       echo '<p><img src="' . $new_path . '" alt="Your processed WeeklyPic" width="600" ><br />';
       echo '<small>Falls dein Bild gedreht dargestellt wird, berücksichtigt dein Browser den Style "image-orientation: from-image;" nicht. Das sollte allerdings kein Problem sein.</small></p>';
+      // HINT: Image Orientation (find it in the css style above) is currently only supported by Firefox
+      // IDEA: Rotate a portrait image?
 
       $_SESSION['pathfilename'] = $new_path;
       $_SESSION['filebasename'] = $filename;
+      $_SESSION['user'] = $user;
 
     ?>
 

@@ -16,11 +16,13 @@ Ein (einfaches) PHP-Skript, um ein JPG-Bild auf die richtigen Proportionen zu sk
 * Voreinstellung der Wochen- und Monatsnummern für den Dateinamen (änderbar)
 * Automatische Generierung eines gültigen Weekly-Pic Dateinamens
 * Direkter Upload des Bildes an upload.weeklypic.de
+* Mobilegeräte freundliches Design
 
 # Roadmap
 
 * Aufruf einer Karte mit den GPS Koordinaten des Bildes (sofern vorhanden)
 * Prüfen der des Aufnahmedatums gegen die Woche, bzw. den Monat
+* Korrektur falscher EXIF-Daten aus dem Export von Darktable (siehe "Konwon Bugs")
 
 # Hinweis
 
@@ -31,3 +33,8 @@ So sind beispielsweise, wenn der Künstler geändert werden soll, die folgenden 
 * EXIF:Artist
 * IPTC:by-line
 * XMP:creator
+
+# Bekannte Probleme
+
+* Aus Darktable exportierte EXIF-Daten wahrscheinlich falsch.
+  * Es sieht so aus, dass aus Darktable exportierte Daten bei der Verarbeitung mit exiftool zu einem `Error = Bad Format (0) für IFD0-Eintrag 0` führen.

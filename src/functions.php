@@ -44,7 +44,7 @@
           echo '<p>Bitte informiere einen Admin über das Problem.</p>';
           return FALSE;
         } else {
-          echo '<p>♻️ Das Bild wurde vom Server gelöscht.</p>';
+          echo '<p>♻️ Das Bild wurde von diesem Server gelöscht.</p>';
           return TRUE;
         }
       }
@@ -57,12 +57,26 @@
 
   function log_command_result($cmd, $result, $output) {
     global $command_log;
-    $log_msg = PHP_EOL . 'time:' . date("F j, Y, g:i a") . PHP_EOL .
+    $log_msg = PHP_EOL . 'time:' . date("c") . PHP_EOL .
                'command: ' . $cmd . PHP_EOL . 'result: ' . $result . PHP_EOL .
                'output:' . PHP_EOL . print_r($output, TRUE) . PHP_EOL .
                '-- END --' . PHP_EOL . PHP_EOL ;
     if(file_put_contents($command_log, $log_msg, FILE_APPEND) === FALSE) {
-      echo "<p>⚠️ Problem bei Fehler-Log $command_log schreiben</p>";
+      echo "<p>⚠️ Problem bei Command-Log schreiben</p>";
+    }
+  }
+
+  function log_usage($page, $user) {
+    global $usage_log;
+    global $usage_logging;
+    if($usage_logging == 0) { return; }
+    if($usage_logging == 1) {
+      $log_msg = date("c") . ';' . $page . PHP_EOL ;
+    } else {
+      $log_msg = date("c") . ';' . $page . ';' . $user . PHP_EOL ;
+    }
+    if(file_put_contents($usage_log, $log_msg, FILE_APPEND) === FALSE) {
+      echo "<p>⚠️ Problem bei Log schreiben</p>";
     }
   }
 
