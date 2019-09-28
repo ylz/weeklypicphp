@@ -22,12 +22,37 @@
     <?php
       // configuration constants
       include 'src/config.php';
-      
+      // more functions
       include 'src/functions.php';
-      $filename = $_SESSION['filename'];
-      if (isset($_POST['delete'])) { // delete button was klicked
-        delete_file($filename);
+
+      // get values from Session
+      $pathfilename = $_SESSION['pathfilename'];
+      $filebasename = $_SESSION['filebasename'];
+      $user         = $_SESSION['user'];
+      log_usage('3', $user);
+
+      // upload
+      if (isset($_POST['upload'])) { // upload button was klicked
+        $command = $curl_command . ' -u ' . $upload_login . ' -X PUT --data-binary @"' .
+                   $pathfilename . '" "' . $upload_server . $filebasename . '.jpg" 2>&1';
+        exec($command, $data, $result);
+        if($debugging) { // debug
+          echo "<p>command: "; print_r($command);
+          echo "<br>data: <br><pre>"; print_r($data); echo "</pre>";
+          echo "<br>result: "; print_r($result);
+          echo "</p>";
+        }
+        if($result !== 0) {
+          log_command_result($command, $result, $data);
+          echo '<p>⚠️ Problem beim Upload aufgetreten.</p>';
+        } else {
+          echo '<p>✅ Das Bild wurde hochgeladen! 😃</p>';
+        }
       }
+
+      // delete - always
+      delete_file($pathfilename);
+
     ?>
 
     <p>Sollte etwas nicht wie erwartet funktionieren, informiere bitte den Admin dieses Servers.</p>

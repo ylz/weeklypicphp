@@ -17,20 +17,20 @@
   <body>
 
   	<h1>Hallo! ❤️</h1>
+    <h2>Wilkommen zu WeeklyPicPHP β!</h2>
     <p>Hier kannst du einfach dein Wochen- oder Monatsbild skalieren auf
-       2048 Pixel (lange Kante) und deine EXIF Beschreibung als Tag setzen.
-       Das Ergebnis lädst du auf dein Gerät wieder herunter und danach auf
+       2000 Pixel (lange Kante) und deine EXIF Beschreibung als Tag setzen.
+       Das Ergebnis kannst du von hier direkt auf Upload.WeeklyPic.de
+       hochladen lassen, oder einfach herunterladen und danach selbst auf
        <a href='https://upload.weeklypic.de/'>https://upload.weeklypic.de/</a>
-       hoch.</p>
-    <p>Disclaimer: Ja, die Bilder werden zumindest aktuell noch auf diesem
-       Server hier gespeichert und sind mit dem selbem Passwort geschützt
-       abrufbar. Ich lösche die Bilder periodisch von Hand. Für die
-       Funktionalität der Script und auch die Verfügbarkeit übernehme
-       ich weder Garantie noch Haftung.</p>
+       hochladen, wenn du möchtest.</p>
+    <hr />
+    <h3>Dein Bild und Eckdaten</h3>
 
     <?PHP
-      // configuration constants
+      // configuration constants and define functions
       include 'src/config.php';
+      include 'src/functions.php';
 
       // read cookie storing common values (Weekly-Pic-Name, Creator, license)
       if(isset($_COOKIE[$cookie_name])) {
@@ -45,17 +45,20 @@
         $val_license   = '';
         $val_usecookie = ' ';
       }
+      log_usage('1', $val_user);
 
       // set default week and month numbers
       $default_month = date('n');
       $default_week  = date('W');
+
+      // IDEA: general footer with Authors and link to github
 
     ?>
 
     <p>
       <form action="doit.php" method="post" enctype="multipart/form-data">
         <p>
-          Datei auswählen:<br/>
+          Bild-Datei auswählen:<br/>
           <input type="file" name="fileToUpload" id="fileToUpload" required>
         </p>
         <p>
@@ -86,6 +89,16 @@
         </p>
       </form>
     </p>
+
+    <hr />
+    <h3>Disclaimer</h3>
+    <p>Die Bilder, die nicht gelöscht wurden, werden periodisch von Hand gelöscht.<br>
+       Zugriffe auf die Seite werden protokolliert.
+       Wenn bei der Bildbearbeitung Fehler auftreten werden diese zu analyse Zwecken protokolliert.<br />
+       Bei Problemen wende dich bitte an die Entwickler im WeeklyPic Slack.<br />
+       Die Anwedung hat noch Beta Status. Für die Funktionalität und
+       die Verfügbarkeit wird weder Garantie noch Haftung übernommen.</p>
+    <p>Den Quellcode findest du auf <a href="https://github.com/ylz/weeklypicphp/">GitHub</a>.</p>
 
   </body>
 </html>
