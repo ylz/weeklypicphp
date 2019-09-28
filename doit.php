@@ -167,7 +167,7 @@
 
       //Alles okay, verschiebe Datei an neuen Pfad
       move_uploaded_file($fileToUpload['tmp_name'], $new_path);
-      echo 'Bild erfolgreich hochgeladen: <a href="'.$new_path.'">'.$new_path.'</a>';
+      echo 'Bild erfolgreich hochgeladen.'; // : <a href="'.$new_path.'">'.$new_path.'</a>';
 
 
       //####################################################################
@@ -208,6 +208,8 @@
       $requested['.CreatorWorkURL']        = $requested['.URL'];
 
       $requested['?GPS']                   = $no_geo ? $tag_not_set : $tag_is_set;
+      $requested['.GPS']                   = ''; // debug
+      $requested['.GPSPosition']           = '';
 
       $requested['.CreateDate']            = '';
       $requested['=Month']                 = $requested_month;

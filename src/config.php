@@ -18,7 +18,7 @@
   $tag_is_set       = 'ja';
   $tag_not_set      = 'nein';
 
-  date_default_timezone_set('Europe/Berlin');
+  date_default_timezone_set('Europe/Berlin');  // see https://www.php.net/manual/en/timezones.php
 
   if($debugging) { // debug
     echo "<p>⚠️ DEBUGGING IS SET TO TRUE! DON'T DO THIS ON A PUBLIC SERVER! ⚠️</p>";

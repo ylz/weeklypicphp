@@ -18,7 +18,6 @@
         return $tag_not_set;
       }
     } elseif(substr($tag,0,1) == '=') {  // will be calculated
-      // ToDo: calulation of values starting with =
       switch ($tag) {
         case '=Month':
             return date('n', strtotime(exif_get_tag_value($list, 'CreateDate'))); // REVIEW: is this secure/stable?
@@ -42,7 +41,7 @@
 
 
   function scale_to($to, $me, $other) {
-    // If $me is scaled $to, then the $other side is sclaqed to return value
+    // If $me is scaled $to, then the $other side is scaled to return value
     return (int) ( $other / ( ( $me * 1.0 ) / $to ) );  // must convert to float (* 1.0) and back to int
   }
 
@@ -91,8 +90,18 @@
       echo "</td></tr>";
     }
     echo "</table></p>";
+    // BUG: GPS detected even if deleted because of GPSVersionID Tag 
+    echo "<p><small>Achtung, es kann hier angezeigt werden, das GPS Daten vorhanden sind, obwohl diese gelöscht wurden, weil noch eine GPS-Version-ID vorhanden ist, was in Ordnung ist. Die Fehlerbehebung ist in Arbeit.</small></p>";
 
-    // IDEA: if GPS data exists, show and generate link to OSM
+    // link GPS data to OSM
+    $geocoordinates = exif_get_tag_value($exif_data, 'GPSPosition');
+    if($geocoordinates <> '') {
+      $geocoordinates = str_ireplace ( ' deg' , '°' , $geocoordinates );
+      $urlgeocoordinates = urlencode($geocoordinates);
+      echo 'Die Geokoordinaten des Bildes' .
+         '<a href="https://www.openstreetmap.org/search?query=' . $urlgeocoordinates .
+         '" target="_blank">' . $geocoordinates . '</a> (Link in neuem Fenster zu Openstreetmap.org)';
+    }
 
   }
 
