@@ -56,6 +56,8 @@
 
     <?php
 
+      // REVIEW: make output nicer if upload server config file is missing.
+      
       // IDEA: validate picture date against requested week/month and year
       // Maybe calculate and check the date-range inbetween the foto should have been made
       // $requested['=DateFrom']              = '';  // The date-range inbetween
@@ -307,11 +309,11 @@
     ?>
 
     <h2>Und nun?</h2>
-    <p>Hier kannst du das Bild nun dirket zum WeeklyPic-Upload senden und hier löschen.<br>
+    <p><?php if($upload_ok) { echo 'Hier kannst du das Bild nun dirket zum WeeklyPic-Upload senden und hier löschen.<br>'; } ?>
        Sollte dir das Ergebnis hier nicht gefallen, solltest du das Bild hier löschen. (Sonst wird es auch irgendwann später gelöscht.)</p>
     <p><form method="post" action="final.php?<?php echo htmlspecialchars(SID); ?>">
-      <input type="submit" name="upload" value="hochladen und löschen" ?>
-      <input type="submit" name="delete" value="löschen" ?>&nbsp;&nbsp;&nbsp;
+      <?php if($upload_ok) { echo '<input type="submit" name="upload" value="hochladen und löschen">'; } ?>
+      <input type="submit" name="delete" value="löschen" >&nbsp;&nbsp;&nbsp;
     </form></p>
     <p>Alternativ kannst du das Bild (mit einem Rechtsklick auf das Bild)
        heruntergeladen und wieder auf

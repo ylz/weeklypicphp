@@ -36,6 +36,7 @@
   $upload_server_f  = 'src/upload_server.config';
   $upload_server = 'na';
   $upload_login  = 'na';
+  $upload_ok     = FALSE;
   if (file_exists($upload_server_f)) {
     $server_config_lines = explode(PHP_EOL, file_get_contents($upload_server_f));
     foreach ($server_config_lines as $line) {
@@ -43,21 +44,26 @@
         if($upload_server == 'na') {
           $upload_server = trim(substr($line, 7));
         } else {
-          cancel_processing('Error in Upload-Server-Configuration, server already defined.');
+          echo '<p>⚠️ Error in Upload-Server-Configuration, server already defined.';
         }
       } elseif (substr($line, 0, 6) == 'login=') {
         if($upload_login == 'na') {
           $upload_login = trim(substr($line, 6));
         } else {
-          cancel_processing('Error in Upload-Server-Configuration, login already defined.');
+          echo '<p>⚠️ Error in Upload-Server-Configuration, login already defined.';
         }
       }
     }
     if($upload_server == 'na' OR $upload_login == 'na') {
-      cancel_processing('Upload-Server-Configuration incomplete!');
+      echo '<p>⚠️ Upload-Server-Configuration incomplete!';
+    } else {
+      $upload_ok = TRUE;
     }
   } else {
-    cancel_processing('Upload-Server-Configuration file is missing!');
+    echo '<p>⚠️ Upload-Server-Configuration file is missing!';
+  }
+  if(!$upload_ok) {
+    echo '<br>Es ist kein automatischer Upload zu WeekyPic möglich. Dies kann nur manuell (Download+Upload) erfolgen.</p>';
   }
 
   if($debugging OR FALSE) { // debug
