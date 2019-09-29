@@ -90,8 +90,8 @@
       echo "</td></tr>";
     }
     echo "</table></p>";
-    // BUG: GPS detected even if deleted because of GPSVersionID Tag 
-    echo "<p><small>Achtung, es kann hier angezeigt werden, das GPS Daten vorhanden sind, obwohl diese gelöscht wurden, weil noch eine GPS-Version-ID vorhanden ist, was in Ordnung ist. Die Fehlerbehebung ist in Arbeit.</small></p>";
+    // BUG: GPS detected even if deleted because of GPSVersionID Tag
+    echo "<p><small>Achtung, es kann hier angezeigt werden, dass GPS Daten vorhanden sind, obwohl diese gelöscht wurden, weil noch eine GPS-Version-ID vorhanden ist, was in Ordnung ist. Die Fehlerbehebung ist in Arbeit.</small></p>";
 
     // link GPS data to OSM
     $geocoordinates = exif_get_tag_value($exif_data, 'GPSPosition');

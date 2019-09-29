@@ -19,10 +19,10 @@ A simple PHP script to scale a JPG image to the right proportions and set EXIF d
 * Automatic generation of valid weekly-pic filename
 * Direct upload of picture to upload.weeklypic.de
 * Mobile friendly layout
+* Call up a map with the GPS coordinates of the image (if available)
 
 # Roadmap
 
-* Call up a map with the GPS coordinates of the image (if available)
 * Check the date, on which the picture was taken, against the week or month
 * Fix wrong EXIF data after exported from Darktable (see "Konwon Bugs")
 
@@ -54,3 +54,4 @@ So, for example, when the artist should be changed, the following tags are affec
 
 * Darktable EXIF data probably wrong.
   * It seeems, that data exported from Darktable result in an `Error = Bad format (0) for IFD0 entry 0` when processed with exiftool.
+* It may be incorrectly displayed that GPS data is present even though it has been deleted because a GPS version ID is still present. However, geodata has been deleted.
