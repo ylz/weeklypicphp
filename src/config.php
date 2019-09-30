@@ -10,7 +10,6 @@
   $log_folder       = '_log/';                      // Das Log-Verzeichnis
   $command_log      = $log_folder . 'exec_cmd.log';
   $usage_log        = $log_folder . 'usage.log';
-  $usage_logging    = 1; // 0=no logging, 1=only pages, 2=and user
   $convert_command  = '/usr/local/bin/convert';     // imagemagick convert
   $exiftool_command = '/usr/local/bin/exiftool';    // EXIFtool
   $curl_command     = '/usr/bin/curl';              // curl
@@ -29,6 +28,7 @@
   // ----
   // server=<URL of the server>
   // login=<login to server>
+  // loglevel=<n>   // 0=no logging, 1=only pages, 2=and user
   // ----
   // Of course you could set the parameters directly here as well - but that's
   // not handy if you use github. ;)
@@ -36,6 +36,7 @@
   $upload_server_f  = 'src/upload_server.config';
   $upload_server = 'na';
   $upload_login  = 'na';
+  $usage_logging = 99;  //  99=unset
   $upload_ok     = FALSE;
   if (file_exists($upload_server_f)) {
     $server_config_lines = explode(PHP_EOL, file_get_contents($upload_server_f));
@@ -52,6 +53,12 @@
         } else {
           echo '<p>⚠️ Error in Upload-Server-Configuration, login already defined.';
         }
+      } elseif (substr($line, 0, 9) == 'loglevel=') {
+        if($usage_logging == 99) {
+          $usage_logging = intval(trim(substr($line, 9)));
+        } else {
+          echo '<p>⚠️ Error in Upload-Server-Configuration, loglevel already defined.';
+        }
       }
     }
     if($upload_server == 'na' OR $upload_login == 'na') {
@@ -59,6 +66,7 @@
     } else {
       $upload_ok = TRUE;
     }
+    if($usage_logging == 99) { $usage_logging = 1; } // Default, log pages called
   } else {
     echo '<p>⚠️ Upload-Server-Configuration file is missing!';
   }
