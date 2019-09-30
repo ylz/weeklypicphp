@@ -2,3 +2,5 @@
 .DS_Store
 _files/*.jpg
 _files/*.jpeg
+*.log
+src/upload_server.config

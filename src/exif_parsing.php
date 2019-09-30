@@ -1,20 +1,32 @@
 <?php
 
-  // TODO: check that this include is not readable from browser (hardening), maybe use .htaccess
-
   function exif_get_tag_value($list, $tag) {
   // from a $list of EXIF-tags (returned by exiftool -s) pick the first one
   // *starting* with $tag and return its value (after the colon, trimmed).
   // To get the exact tag add a space to $tag.
-  // If the $tag starts with a "." or "?" this will be removed bevore the search.
-  // If it started with a "?", "ja" will be returned if a tag was found, otherwise "nein"
+  // If the $tag starts with a ".", "=" or "?" this will be removed bevore the search.
+  // If it starts with a "?", $tag_is_set will be returned if a tag was found, otherwise $tag_not_set
+  // If it starts with a "=", it's value is calculated
+    global $tag_is_set;
+    global $tag_not_set;
     if(substr($tag,0,1) == '.') {  // Extra processing for Meta-Tag
       return exif_get_tag_value($list, substr($tag, 1));
     } elseif(substr($tag,0,1) == '?') {  // Extra processing for Meta-Tag yes/no
       if(exif_get_tag_value($list, substr($tag, 1)) !== '') {
-        return 'Ja';
+        return $tag_is_set;
       } else {
-        return 'Nein';
+        return $tag_not_set;
+      }
+    } elseif(substr($tag,0,1) == '=') {  // will be calculated
+      switch ($tag) {
+        case '=Month':
+            return date('n', strtotime(exif_get_tag_value($list, 'CreateDate'))); // REVIEW: is this secure/stable?
+            break;
+        case '=Week':
+            return date('W', strtotime(exif_get_tag_value($list, 'CreateDate'))); // REVIEW: is this secure/stable?
+            break;
+        default:
+            return 'n/a';
       }
     } else {
       foreach($list as $line) {
@@ -29,7 +41,7 @@
 
 
   function scale_to($to, $me, $other) {
-    // If $me is scaled $to, then the $other side is sclaqed to return value
+    // If $me is scaled $to, then the $other side is scaled to return value
     return (int) ( $other / ( ( $me * 1.0 ) / $to ) );  // must convert to float (* 1.0) and back to int
   }
 
@@ -51,7 +63,7 @@
       echo "<br>exiftool_result: "; print_r($exiftool_result);
       echo "</p>";
     }
-    if($exiftool_result !== 0) { die('Fehler beim Aufruf des EXIF-Tools!'); }
+    if($exiftool_result !== 0) { cancel_processing('Fehler beim Aufruf des EXIF-Tools!'); }
 
     // Calculate new size
     $pic_width  = exif_get_tag_value($exif_data, 'ImageWidth');
@@ -67,7 +79,6 @@
     $requested['ExifImageHeight'] = $requested['.ImageHeight'];
 
     // Display comparisom table
-    // IDEA: Maybe its better to have a line by line compare on small displays?
     echo '<p><table style="border:1">';
     echo "<tr><th>EXIF Tag</th><th>aktuell</th><th>soll</th><th>?</th></tr>";
     foreach($requested as $exif_tag=>$exif_value) {
@@ -79,8 +90,18 @@
       echo "</td></tr>";
     }
     echo "</table></p>";
+    // BUG: GPS detected even if deleted because of GPSVersionID Tag
+    echo "<p><small>Achtung, es kann hier angezeigt werden, dass GPS Daten vorhanden sind, obwohl diese gelöscht wurden, weil noch eine GPS-Version-ID vorhanden ist, was in Ordnung ist. Die Fehlerbehebung ist in Arbeit.</small></p>";
 
-    // IDEA: if GPS data exists, show and generate link to OSM
+    // link GPS data to OSM
+    $geocoordinates = exif_get_tag_value($exif_data, 'GPSPosition');
+    if($geocoordinates <> '') {
+      $geocoordinates = str_ireplace ( ' deg' , '°' , $geocoordinates );
+      $urlgeocoordinates = urlencode($geocoordinates);
+      echo 'Die Geokoordinaten des Bildes' .
+         '<a href="https://www.openstreetmap.org/search?query=' . $urlgeocoordinates .
+         '" target="_blank">' . $geocoordinates . '</a> (Link in neuem Fenster zu Openstreetmap.org)';
+    }
 
   }
 
