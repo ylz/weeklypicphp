@@ -57,7 +57,8 @@
     <?php
 
       // REVIEW: make output nicer if upload server config file is missing.
-      
+      // BUG: a not processed upload - i.e. picture is to big - i not detected = no filename
+
       // IDEA: validate picture date against requested week/month and year
       // Maybe calculate and check the date-range inbetween the foto should have been made
       // $requested['=DateFrom']              = '';  // The date-range inbetween
@@ -80,8 +81,13 @@
         echo "cookie_value: " . $cookie_value . '<br/>';
         echo "cookie_name: " . $cookie_name  . '<br/>';
         echo "cookie_expires: " . $cookie_expires . '<br/>';
+        echo "upload folder: " . $upload_folder . '<br/>';
+        echo "command log file: " . $command_log . '<br/>';
+        echo "usage log file: " . $usage_log . '<br/>';
+        echo "log level: " . $usage_logging . '<br/>';
         echo "convert command: " . $convert_command . '<br/>';
-        echo "exiftool command: " . $exiftool_command ;
+        echo "exiftool command: " . $exiftool_command . '<br/>';
+        echo "curl command: " . $curl_command . '<br/>';
         echo '</p>' ;
       }
 

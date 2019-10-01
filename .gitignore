@@ -4,3 +4,4 @@ _files/*.jpg
 _files/*.jpeg
 *.log
 src/upload_server.config
+*.config

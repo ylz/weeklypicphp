@@ -24,7 +24,7 @@ A simple PHP script to scale a JPG image to the right proportions and set EXIF d
 # Roadmap
 
 * Check the date, on which the picture was taken, against the week or month
-* Fix wrong EXIF data after exported from Darktable (see "Konwon Bugs")
+* Fix wrong EXIF data after exported from Darktable (see "Known Bugs")
 
 # Hint
 
@@ -47,7 +47,7 @@ So, for example, when the artist should be changed, the following tags are affec
 2. Check src/config.php and adapt to your needs.
 3. In `_log` directory copy `htaccess` file to `.htaccess`.
 3. In `src` directory copy `htaccess` file to `.htaccess`.
-5. Create `src/upload_server.config` file and fill it with *server* and *login* (see src/config.php).
+5. Create `src/config.config` file and fill it at least with *server* and *login* for upload functionality (see src/config.php for more information).
 
 
 # Known Problems
