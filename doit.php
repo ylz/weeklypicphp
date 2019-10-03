@@ -57,7 +57,9 @@
     <?php
 
       // REVIEW: make output nicer if upload server config file is missing.
-      
+      // BUG: a not processed upload - i.e. picture is to big - i not detected = no filename
+      // IDEA: make a web-page to show all EXIF data
+
       // IDEA: validate picture date against requested week/month and year
       // Maybe calculate and check the date-range inbetween the foto should have been made
       // $requested['=DateFrom']              = '';  // The date-range inbetween
@@ -80,8 +82,13 @@
         echo "cookie_value: " . $cookie_value . '<br/>';
         echo "cookie_name: " . $cookie_name  . '<br/>';
         echo "cookie_expires: " . $cookie_expires . '<br/>';
+        echo "upload folder: " . $upload_folder . '<br/>';
+        echo "command log file: " . $command_log . '<br/>';
+        echo "usage log file: " . $usage_log . '<br/>';
+        echo "log level: " . $usage_logging . '<br/>';
         echo "convert command: " . $convert_command . '<br/>';
-        echo "exiftool command: " . $exiftool_command ;
+        echo "exiftool command: " . $exiftool_command . '<br/>';
+        echo "curl command: " . $curl_command . '<br/>';
         echo '</p>' ;
       }
 
@@ -121,7 +128,8 @@
 
       //Überprüfung der Dateiendung
       $extension = strtolower(pathinfo($upload_file, PATHINFO_EXTENSION));
-      $allowed_extensions = array('png', 'jpg', 'jpeg', 'JPG', 'JPEG');
+      //$allowed_extensions = array('png', 'jpg', 'jpeg', 'JPG', 'JPEG');
+      $allowed_extensions = array('jpg', 'jpeg', 'JPG', 'JPEG');
       if(!in_array($extension, $allowed_extensions)) {
         cancel_processing("Fehler! Ungültige Dateiendung.");
       }
@@ -134,7 +142,8 @@
 
       //Überprüfung dass das Bild keine Fehler enthält
       if(function_exists('exif_imagetype')) { //Die exif_imagetype-Funktion erfordert die exif-Erweiterung auf dem Server
-        $allowed_types = array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF);
+        //$allowed_types = array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF);
+        $allowed_types = array(IMAGETYPE_JPEG);
         $detected_type = exif_imagetype($fileToUpload["tmp_name"]);
         if($debugging == true) {
           echo "<p>allowed extensions: ";

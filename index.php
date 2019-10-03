@@ -18,10 +18,11 @@
 
   	<h1>Hallo! ❤️</h1>
     <h2>Wilkommen zu WeeklyPicPHP β!</h2>
-    <p>Hier kannst du einfach dein Wochen- oder Monatsbild skalieren auf
-       2000 Pixel (lange Kante) und deine EXIF Beschreibung als Tag setzen.
-       Das Ergebnis kannst du von hier direkt auf Upload.WeeklyPic.de
-       hochladen lassen, oder einfach herunterladen und danach selbst auf
+    <p>Hier kannst du auf einfachem Weg dein Wochen- oder Monatsbild skalieren auf
+       2000 Pixel (lange Kante) skalieren und deine EXIF Beschreibung als Tag setzen.
+       Nach dem Bearbeiten kannst du das Ergebnis kannst du von hier direkt auf
+       Upload.WeeklyPic.de hochladen lassen.
+       Alternativ kannst du es einfach herunterladen und danach selbst auf
        <a href='https://upload.weeklypic.de/'>https://upload.weeklypic.de/</a>
        hochladen, wenn du möchtest.</p>
     <hr />
@@ -62,7 +63,7 @@
           <input type="file" name="fileToUpload" id="fileToUpload" required>
         </p>
         <p>
-          WeeklyPic-Benutzername △:<br/>
+          WeeklyPic-Benutzername 🍪:<br/>
           <input type="text" id="user" name="user" value="<?= $val_user ?>" required><br/>
           Bildbeschreibung (wird von WeeklyPic genutzt, optional):<br/>
           <input type="text" id="description" name="description">
@@ -75,14 +76,14 @@
           Monat <input type="number" name="month_number" min="1" max="12" step="1=" value="<?= $default_month ?>"><br/>
         </p>
         <p>
-          Urheber △ (optional):<br/>
+          Urheber 🍪 (optional):<br/>
           <input type="text" id="creator" name="creator" value="<?= $val_creator ?>"><br/>
-          Lizenz △ (optional):<br/>
+          Lizenz 🍪 (optional):<br/>
           <input type="text" id="license" name="license" value="<?= $val_license ?>"><br/>
           <input type="checkbox" id="nogeo" name="nogeo" value="nogeo"> Lösche Geo-Daten aus dem Bild.<br>
         </p>
         <p>
-          <input type="checkbox" id="usecookie" name="usecookie" value="usecookie" <?= $val_usecookie ?> > Nutze ein Cookie für deine △-Daten.
+          <input type="checkbox" id="usecookie" name="usecookie" value="usecookie" <?= $val_usecookie ?> > Nutze ein Cookie für deine 🍪-Daten.
         </p>
         <p>
           <input type="submit" value="Bild hochladen und bearbeiten" name="submit">
@@ -95,7 +96,7 @@
     <p>Die Bilder, die nicht gelöscht wurden, werden periodisch von Hand gelöscht.<br>
        Zugriffe auf die Seite werden protokolliert.
        Wenn bei der Bildbearbeitung Fehler auftreten werden diese zu analyse Zwecken protokolliert.<br />
-       Bei Problemen wende dich bitte an die Entwickler im WeeklyPic Slack.<br />
+       Bei Problemen wende dich bitte an die Entwickler im WeeklyPic-Slack-Channel #entwickler-talk.<br />
        Die Anwedung hat noch Beta Status. Für die Funktionalität und
        die Verfügbarkeit wird weder Garantie noch Haftung übernommen.</p>
     <p>Den Quellcode findest du auf <a href="https://github.com/ylz/weeklypicphp/">GitHub</a>.</p>
